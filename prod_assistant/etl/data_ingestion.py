@@ -85,14 +85,16 @@ class DataIngestion:
 
         documents = []
         for entry in product_list:
+            # Convert NaN values to None for JSON serialization
             metadata = {
-                    "product_id": entry["product_id"],
-                    "product_title": entry["product_title"],
-                    "rating": entry["rating"],
-                    "total_reviews": entry["total_reviews"],
-                    "price": entry["price"]
+                    "product_id": entry["product_id"] if pd.notna(entry["product_id"]) else "",
+                    "product_title": entry["product_title"] if pd.notna(entry["product_title"]) else "",
+                    "rating": str(entry["rating"]) if pd.notna(entry["rating"]) else "N/A",
+                    "total_reviews": str(entry["total_reviews"]) if pd.notna(entry["total_reviews"]) else "N/A",
+                    "price": str(entry["price"]) if pd.notna(entry["price"]) else "N/A"
             }
-            doc = Document(page_content=entry["top_reviews"], metadata=metadata)
+            page_content = entry["top_reviews"] if pd.notna(entry["top_reviews"]) else ""
+            doc = Document(page_content=page_content, metadata=metadata)
             documents.append(doc)
 
         print(f"Transformed {len(documents)} documents.")
